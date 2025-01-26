@@ -19,7 +19,7 @@ import { Input } from "./ui/input";
 const AppSidebar = () => {
   return (
     <Sidebar>
-      <SidebarHeader className="bg-sidebar-background h-16 border-b">
+      <SidebarHeader className="h-16 border-b">
         <div className="flex h-full w-full items-center justify-center gap-2.5">
           <Input type="text" placeholder="Search Chats..." className="flex-1" />
           <Button type="button" variant="outline" size="icon">
@@ -27,7 +27,7 @@ const AppSidebar = () => {
           </Button>
         </div>
       </SidebarHeader>
-      <SidebarContent className="bg-sidebar-background">
+      <SidebarContent>
         <SidebarGroup>
           <SidebarMenu>
             {items.map((item) => (

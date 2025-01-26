@@ -1,11 +1,16 @@
+import { UserButton } from "@clerk/nextjs";
+
 import { ModeToggle } from "./mode-toggle";
 import { SidebarTrigger } from "./ui/sidebar";
 
-const Navbar = () => {
+const Navbar = async () => {
   return (
-    <nav className="flex h-16 w-full items-center justify-between border-b px-2.5">
+    <nav className="flex h-16 w-full items-center justify-between border-b bg-sidebar px-2.5">
       <SidebarTrigger />
-      <ModeToggle />
+      <div className="flex gap-2.5">
+        <ModeToggle />
+        <UserButton />
+      </div>
     </nav>
   );
 };

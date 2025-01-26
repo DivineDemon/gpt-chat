@@ -1,6 +1,8 @@
 import { type Metadata } from "next";
 import { Fira_Code } from "next/font/google";
 
+import { ClerkProvider } from "@clerk/nextjs";
+
 import "@/assets/css/globals.css";
 import Providers from "@/components/providers";
 import { cn } from "@/lib/utils";
@@ -19,10 +21,19 @@ export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en" suppressHydrationWarning={true}>
-      <body className={cn("antialiased", firaCode.className)}>
-        <Providers>{children}</Providers>
-      </body>
-    </html>
+    <ClerkProvider>
+      <html lang="en" suppressHydrationWarning={true}>
+        <body
+          className={cn(
+            "flex min-h-[calc(100vh-1px)] flex-col antialiased",
+            firaCode.className
+          )}
+        >
+          <main className="relative flex flex-1 flex-col">
+            <Providers>{children}</Providers>
+          </main>
+        </body>
+      </html>
+    </ClerkProvider>
   );
 }

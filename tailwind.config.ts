@@ -62,6 +62,16 @@ export default {
           ring: "hsl(var(--sidebar-ring))",
         },
       },
+      keyframes: {
+        "fade-dots": {
+          "0%": { opacity: "0.2", transform: "scale(0.1)" },
+          "60%": { opacity: "1", transform: "scale(1.2)" },
+          "100%": { opacity: "0.2", transform: "scale(0.1)" },
+        },
+      },
+      animation: {
+        "fade-dots": "fade-dots .8s infinite",
+      },
     },
   },
   plugins: [require("tailwindcss-animate")],

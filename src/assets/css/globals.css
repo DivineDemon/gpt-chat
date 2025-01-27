@@ -3,6 +3,28 @@
 @tailwind utilities;
 
 @layer base {
+  input {
+    @apply focus:outline-0 focus:outline-none focus:ring-0 focus-visible:outline-0 focus-visible:outline-none focus-visible:ring-0;
+  }
+
+  select {
+    @apply focus:outline-0 focus:outline-none focus:ring-0 focus-visible:outline-0 focus-visible:outline-none focus-visible:ring-0;
+  }
+
+  button {
+    @apply focus:outline-0 focus:outline-none focus:ring-0 focus-visible:outline-0 focus-visible:outline-none focus-visible:ring-0;
+  }
+
+  a {
+    @apply focus:outline-0 focus:outline-none focus:ring-0 focus-visible:outline-0 focus-visible:outline-none focus-visible:ring-0;
+  }
+
+  textarea {
+    @apply focus:outline-0 focus:outline-none focus:ring-0 focus-visible:outline-0 focus-visible:outline-none focus-visible:ring-0;
+  }
+}
+
+@layer base {
   :root {
     --background: 0 0% 100%;
     --foreground: 240 10% 3.9%;

@@ -1,4 +1,5 @@
 import AppSidebar from "@/components/app-sidebar";
+import ChatBox from "@/components/chat/chat-box";
 import MaxWidthWrapper from "@/components/max-width-wrapper";
 import Navbar from "@/components/navbar";
 
@@ -11,7 +12,7 @@ const Page = () => {
         <div className="flex h-[calc(100vh-64px)] w-full p-5">
           <div className="h-full w-full flex-col items-start justify-start">
             <MaxWidthWrapper>
-              <div className="">Page</div>
+              <ChatBox />
             </MaxWidthWrapper>
           </div>
         </div>

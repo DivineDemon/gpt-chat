@@ -7,3 +7,5 @@
 - [ ] Web Search
 - [ ] Code Formatting in AI Response
 - [ ] User Persistence in DB
+- [ ] Message Copy
+- [ ] Chat CRUD

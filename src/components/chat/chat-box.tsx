@@ -62,7 +62,7 @@ const ChatBox = () => {
 
   return (
     <div className="flex h-full w-full flex-col items-center justify-between gap-5">
-      <div className="flex h-full max-h-[calc(100vh-178px)] w-full flex-col items-center justify-start gap-8 overflow-y-auto rounded-xl border p-4">
+      <div className="flex h-full max-h-[calc(100vh-202px)] w-full flex-col items-center justify-start gap-8 overflow-y-auto rounded-xl border p-4">
         {messages.map((message) => (
           <Fragment key={message.id}>
             <span className="ml-auto w-fit max-w-md text-wrap rounded-xl bg-primary/20 px-4 py-1 text-right text-primary">
@@ -96,68 +96,74 @@ const ChatBox = () => {
         ))}
         <div ref={messagesEndRef} />
       </div>
-      <form
-        onSubmit={(e) => {
-          e.preventDefault();
-          handleMessage();
-        }}
-        className="flex w-full items-center justify-center overflow-hidden rounded-full bg-muted px-5 py-2.5"
-      >
-        <Input
-          type="text"
-          value={message}
-          disabled={loading}
-          placeholder="What can I help with ?"
-          className="flex-1 border-none shadow-none"
-          onChange={(e) => setMessage(e.target.value)}
-        />
-        <Input
-          type="file"
-          multiple={true}
-          max={3}
-          ref={fileRef}
-          className="hidden"
-          onChange={(e) => {
-            if (e.target.files) {
-              setFiles(Array.from(e.target.files));
-            }
+      <div className="flex w-full flex-col items-center justify-center gap-1.5">
+        <form
+          onSubmit={(e) => {
+            e.preventDefault();
+            handleMessage();
           }}
-        />
-        <div className="flex items-center justify-center gap-5">
-          <button
-            type="submit"
-            disabled={loading || !message}
-            className="size-8 rounded-full bg-primary p-1.5 text-white hover:bg-primary/90"
-          >
-            <ArrowUp className="size-full" />
-          </button>
-          <button
-            type="button"
-            onClick={handleFileUpload}
-            disabled={loading || !message}
-            className={cn(
-              "relative size-8 rounded-full bg-black p-1.5 text-white hover:bg-primary/90",
-              {
-                "bg-primary": files.length > 0,
+          className="flex w-full items-center justify-center overflow-hidden rounded-full bg-muted px-5 py-2.5"
+        >
+          <Input
+            type="text"
+            value={message}
+            disabled={loading}
+            placeholder="What can I help with ?"
+            className="flex-1 border-none shadow-none"
+            onChange={(e) => setMessage(e.target.value)}
+          />
+          <Input
+            type="file"
+            multiple={true}
+            max={3}
+            ref={fileRef}
+            className="hidden"
+            onChange={(e) => {
+              if (e.target.files) {
+                setFiles(Array.from(e.target.files));
               }
-            )}
-          >
-            <Paperclip className="size-full" />
-            {files.length > 0 && (
-              <div className="absolute -right-1 -top-1 size-4 rounded-full bg-black text-xs font-semibold text-white dark:bg-white dark:text-black">
-                {files.length}
-              </div>
-            )}
-          </button>
-          <button
-            type="button"
-            disabled={loading || !message}
-            className="size-8 rounded-full bg-black p-1.5 text-white hover:bg-primary/90"
-          >
-            <Globe className="size-full" />
-          </button>
-        </div>
-      </form>
+            }}
+          />
+          <div className="flex items-center justify-center gap-5">
+            <button
+              type="submit"
+              disabled={loading || !message}
+              className="size-8 rounded-full bg-primary p-1.5 text-white hover:bg-primary/90"
+            >
+              <ArrowUp className="size-full" />
+            </button>
+            <button
+              type="button"
+              onClick={handleFileUpload}
+              disabled={loading}
+              className={cn(
+                "relative size-8 rounded-full bg-black p-1.5 text-white hover:bg-primary/90",
+                {
+                  "bg-primary": files.length > 0,
+                }
+              )}
+            >
+              <Paperclip className="size-full" />
+              {files.length > 0 && (
+                <div className="absolute -right-1 -top-1 size-4 rounded-full bg-black text-xs font-semibold text-white dark:bg-white dark:text-black">
+                  {files.length}
+                </div>
+              )}
+            </button>
+            <button
+              type="button"
+              disabled={loading || !message}
+              className="size-8 rounded-full bg-black p-1.5 text-white hover:bg-primary/90"
+            >
+              <Globe className="size-full" />
+            </button>
+          </div>
+        </form>
+        <span className="w-full text-right text-xs text-gray-500">
+          Only text-based and Image files are allowed. A Maximum of only 3 files
+          for each query.
+        </span>
+      </div>
     </div>
   );
 };

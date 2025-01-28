@@ -2,31 +2,58 @@
 
 import { Fragment, useEffect, useRef, useState } from "react";
 
+import MDEditor from "@uiw/react-md-editor";
+import { readStreamableValue } from "ai/rsc";
 import { ArrowUp, Globe, Paperclip } from "lucide-react";
 
-import { chat } from "@/lib/constants";
+import { askQuestion } from "@/app/chat/(server-actions)/ask-question";
+import { cn } from "@/lib/utils";
 
-import { Button } from "../ui/button";
 import { Input } from "../ui/input";
 
 const ChatBox = () => {
+  const fileRef = useRef<HTMLInputElement>(null);
+  const [files, setFiles] = useState<File[]>([]);
   const [message, setMessage] = useState<string>("");
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const [loading, setLoading] = useState<boolean>(false);
-  const [messages, setMessages] = useState<Message[]>(chat);
+  const [messages, setMessages] = useState<Message[]>([]);
 
-  const handleMessage = () => {
+  const handleFileUpload = () => {
+    if (fileRef.current) {
+      fileRef.current.click();
+    }
+  };
+
+  const handleMessage = async () => {
     setMessage("");
     setLoading(true);
 
-    setMessages([
-      ...messages,
-      {
-        id: messages.length + 1,
-        client: message,
-        bot: "",
-      },
+    setMessages((prev) => [
+      ...prev,
+      { id: prev.length + 1, client: message, bot: "" },
     ]);
+
+    try {
+      const { output } = await askQuestion(message, files);
+      for await (const delta of readStreamableValue(output)) {
+        if (delta) {
+          setMessages((prev) => {
+            const updatedMessages = [...prev];
+            const lastMessage = updatedMessages[updatedMessages.length - 1];
+            updatedMessages[updatedMessages.length - 1] = {
+              ...lastMessage,
+              bot: (lastMessage?.bot || "") + delta,
+            } as Message;
+            return updatedMessages;
+          });
+        }
+      }
+    } catch (error) {
+      console.error("Error streaming response:", error);
+    } finally {
+      setLoading(false);
+    }
   };
 
   useEffect(() => {
@@ -35,27 +62,34 @@ const ChatBox = () => {
 
   return (
     <div className="flex h-full w-full flex-col items-center justify-between gap-5">
-      <div className="flex h-full max-h-[calc(100vh-178px)] w-full flex-col items-center justify-start gap-2.5 overflow-y-auto rounded-xl border p-4">
+      <div className="flex h-full max-h-[calc(100vh-178px)] w-full flex-col items-center justify-start gap-8 overflow-y-auto rounded-xl border p-4">
         {messages.map((message) => (
           <Fragment key={message.id}>
-            <span className="ml-auto w-fit max-w-md text-wrap rounded-xl bg-black px-4 py-1 text-right text-white dark:bg-white dark:text-black">
+            <span className="ml-auto w-fit max-w-md text-wrap rounded-xl bg-primary/20 px-4 py-1 text-right text-primary">
               {message.client}
             </span>
             {message.bot === "" ? (
-              <div className="mr-auto flex items-center justify-start rounded-xl bg-muted p-3">
-                <div className="mx-1 size-2 animate-fade-dots rounded-full bg-black dark:bg-white" />
+              <div className="mr-auto flex items-center justify-start rounded-xl bg-primary/20 p-3">
+                <div className="mx-1 size-2 animate-fade-dots rounded-full bg-primary" />
                 <div
-                  className="mx-1 size-2 animate-fade-dots rounded-full bg-black dark:bg-white"
+                  className="mx-1 size-2 animate-fade-dots rounded-full bg-primary"
                   style={{ animationDelay: "0.1s" }}
                 />
                 <div
-                  className="mx-1 size-2 animate-fade-dots rounded-full bg-black dark:bg-white"
+                  className="mx-1 size-2 animate-fade-dots rounded-full bg-primary"
                   style={{ animationDelay: "0.3s" }}
                 />
               </div>
             ) : (
-              <span className="mr-auto w-fit max-w-md text-wrap rounded-xl bg-muted px-4 py-1 text-left">
-                {message.bot}
+              <span className="mr-auto w-full text-wrap rounded-xl bg-transparent text-left text-primary">
+                <MDEditor.Markdown
+                  source={message.bot}
+                  style={{
+                    backgroundColor: "transparent",
+                    color: "hsl(var(--primary))",
+                  }}
+                  className="bg-transparent text-primary"
+                />
               </span>
             )}
           </Fragment>
@@ -77,15 +111,51 @@ const ChatBox = () => {
           className="flex-1 border-none shadow-none"
           onChange={(e) => setMessage(e.target.value)}
         />
+        <Input
+          type="file"
+          multiple={true}
+          max={3}
+          ref={fileRef}
+          className="hidden"
+          onChange={(e) => {
+            if (e.target.files) {
+              setFiles(Array.from(e.target.files));
+            }
+          }}
+        />
         <div className="flex items-center justify-center gap-5">
-          <Button
+          <button
             type="submit"
-            className="size-7 rounded-full bg-black p-1 text-white dark:bg-white dark:text-black"
+            disabled={loading || !message}
+            className="size-8 rounded-full bg-primary p-1.5 text-white hover:bg-primary/90"
           >
             <ArrowUp className="size-full" />
-          </Button>
-          <Paperclip className="size-5" />
-          <Globe className="size-5" />
+          </button>
+          <button
+            type="button"
+            onClick={handleFileUpload}
+            disabled={loading || !message}
+            className={cn(
+              "relative size-8 rounded-full bg-black p-1.5 text-white hover:bg-primary/90",
+              {
+                "bg-primary": files.length > 0,
+              }
+            )}
+          >
+            <Paperclip className="size-full" />
+            {files.length > 0 && (
+              <div className="absolute -right-1 -top-1 size-4 rounded-full bg-black text-xs font-semibold text-white dark:bg-white dark:text-black">
+                {files.length}
+              </div>
+            )}
+          </button>
+          <button
+            type="button"
+            disabled={loading || !message}
+            className="size-8 rounded-full bg-black p-1.5 text-white hover:bg-primary/90"
+          >
+            <Globe className="size-full" />
+          </button>
         </div>
       </form>
     </div>

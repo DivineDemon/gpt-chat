@@ -13,6 +13,7 @@ export const env = createEnv({
     OPENAI_KEY: z.string().regex(/^sk-[a-zA-Z0-9]{48}$/, {
       message: "Invalid OpenAI API key format.",
     }),
+    IMGBB_KEY: z.string(),
   },
   client: {
     NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: z
@@ -34,6 +35,7 @@ export const env = createEnv({
       process.env.NEXT_PUBLIC_CLERK_SIGN_IN_FALLBACK_REDIRECT_URL,
     NEXT_PUBLIC_CLERK_SIGN_UP_FALLBACK_REDIRECT_URL:
       process.env.NEXT_PUBLIC_CLERK_SIGN_UP_FALLBACK_REDIRECT_URL,
+    IMGBB_KEY: process.env.IMGBB_KEY,
   },
   skipValidation: !!process.env.SKIP_ENV_VALIDATION,
   emptyStringAsUndefined: true,

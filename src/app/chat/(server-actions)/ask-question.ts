@@ -6,8 +6,10 @@ import { createStreamableValue } from "ai/rsc";
 
 import { env } from "@/env";
 
+import { parseSpreadsheet } from "./excel-parser";
 import { parseImage } from "./image-parser";
 import { parsePdf } from "./pdf-parser";
+import { parseDocument } from "./word-parser";
 
 const openAI = createOpenAI({
   apiKey: env.OPENAI_KEY,
@@ -28,9 +30,21 @@ export async function askQuestion(query: string, file?: File | File[]) {
     if (file.name.endsWith(".pdf")) {
       const { text } = await parsePdf(file);
       combinedFileContent += `${text}\n\n`;
-    } else {
+    }
+
+    if (file.type.startsWith("image/")) {
       const imageUrl = await parseImage(file);
       imageFiles.push({ type: "image", image: `${imageUrl}` });
+    }
+
+    if (file.name.endsWith(".docx") || file.name.endsWith(".doc")) {
+      const text = await parseDocument(file);
+      combinedFileContent += `${text}\n\n`;
+    }
+
+    if (file.name.endsWith(".xlsx") || file.name.endsWith(".csv")) {
+      const text = await parseSpreadsheet(file);
+      combinedFileContent += `${text}\n\n`;
     }
   }
 

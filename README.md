@@ -1,11 +1,11 @@
 ### Pending Features
 ---
-- [ ] Chat Persistence in DB
-- [ ] Chat Listing with Timeline
+- [x] Chat Persistence in DB
+- [x] Chat Listing with Timeline
 - [x] File Parsing
 - [ ] Previous Chat as Input for LLM
 - [x] Web Search
 - [x] Code Formatting in AI Response
-- [ ] User Persistence in DB
-- [ ] Message Copy
+- [x] User Persistence in DB
+- [x] Message Copy
 - [ ] Chat CRUD

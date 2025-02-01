@@ -1,22 +1,10 @@
 "use server";
 
-import { readFile, unlink, writeFile } from "fs/promises";
-import path from "path";
-
 import { env } from "@/env";
 
 export async function parseImage(file: File) {
   const buffer = Buffer.from(await file.arrayBuffer());
-  const fileName = file.name;
-  const filePath = path.join(
-    "C:/Users/mohdm/Documents/Code/personal/gpt-chat/public/tmp/",
-    fileName
-  );
-
-  await writeFile(filePath, buffer);
-  const fileContent = await readFile(filePath);
-  const base64String = fileContent.toString("base64");
-  await unlink(filePath);
+  const base64String = buffer.toString("base64");
 
   const formData = new FormData();
   formData.append("image", base64String);

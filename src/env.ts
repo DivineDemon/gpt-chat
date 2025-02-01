@@ -14,6 +14,7 @@ export const env = createEnv({
       message: "Invalid OpenAI API key format.",
     }),
     IMGBB_KEY: z.string(),
+    SERPER_KEY: z.string(),
   },
   client: {
     NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: z
@@ -36,6 +37,7 @@ export const env = createEnv({
     NEXT_PUBLIC_CLERK_SIGN_UP_FALLBACK_REDIRECT_URL:
       process.env.NEXT_PUBLIC_CLERK_SIGN_UP_FALLBACK_REDIRECT_URL,
     IMGBB_KEY: process.env.IMGBB_KEY,
+    SERPER_KEY: process.env.SERPER_KEY,
   },
   skipValidation: !!process.env.SKIP_ENV_VALIDATION,
   emptyStringAsUndefined: true,

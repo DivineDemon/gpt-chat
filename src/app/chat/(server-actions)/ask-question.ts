@@ -5,6 +5,7 @@ import { streamText } from "ai";
 import { createStreamableValue } from "ai/rsc";
 
 import { env } from "@/env";
+import { performWebSearch } from "@/lib/web-search";
 
 import { parseSpreadsheet } from "./excel-parser";
 import { parseImage } from "./image-parser";
@@ -20,7 +21,12 @@ type ImageArray = {
   image: string;
 };
 
-export async function askQuestion(query: string, file?: File | File[]) {
+export async function askQuestion(
+  query: string,
+  webSearch: boolean,
+  file?: File | File[]
+) {
+  let webSearchContent = "";
   let combinedFileContent = "";
   const imageFiles: ImageArray[] = [];
   const stream = createStreamableValue();
@@ -48,6 +54,15 @@ export async function askQuestion(query: string, file?: File | File[]) {
     }
   }
 
+  if (webSearch) {
+    try {
+      webSearchContent = await performWebSearch(query);
+    } catch (error) {
+      console.error(error);
+      webSearchContent = "\n[Web search unavailable at this time]";
+    }
+  }
+
   (async () => {
     const { textStream } = await streamText({
       model: openAI("chatgpt-4o-latest"),
@@ -58,6 +73,17 @@ export async function askQuestion(query: string, file?: File | File[]) {
             ...imageFiles,
             { type: "text", text: query },
             { type: "text", text: combinedFileContent },
+            { type: "text", text: webSearchContent },
+            {
+              type: "text",
+              text: "Current Date: " + new Date().toISOString().split("T")[0],
+            },
+            {
+              type: "text",
+              text:
+                "Answer using a combination of uploaded content (if relevant) and web search results. " +
+                "Always cite sources using [number] notation which must be hyperlinked with the web url. Mention when information comes from web results.",
+            },
           ],
         },
       ],

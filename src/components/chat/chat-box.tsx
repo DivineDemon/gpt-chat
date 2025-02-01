@@ -18,6 +18,7 @@ const ChatBox = () => {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const [loading, setLoading] = useState<boolean>(false);
   const [messages, setMessages] = useState<Message[]>([]);
+  const [webSearch, setWebSearch] = useState<boolean>(false);
 
   const handleFileUpload = () => {
     if (fileRef.current) {
@@ -35,7 +36,7 @@ const ChatBox = () => {
     ]);
 
     try {
-      const { output } = await askQuestion(message, files);
+      const { output } = await askQuestion(message, webSearch, files);
       for await (const delta of readStreamableValue(output)) {
         if (delta) {
           setMessages((prev) => {
@@ -108,7 +109,7 @@ const ChatBox = () => {
             type="text"
             value={message}
             disabled={loading}
-            placeholder="What can I help with ?"
+            placeholder={`What can I help with ? ${webSearch}`}
             className="flex-1 border-none shadow-none"
             onChange={(e) => setMessage(e.target.value)}
           />
@@ -152,8 +153,14 @@ const ChatBox = () => {
             </button>
             <button
               type="button"
-              disabled={loading || !message}
-              className="size-8 rounded-full bg-black p-1.5 text-white hover:bg-primary/90"
+              disabled={loading}
+              onClick={() => setWebSearch(!webSearch)}
+              className={cn(
+                "size-8 cursor-pointer rounded-full bg-black p-1.5 text-white hover:bg-primary/90",
+                {
+                  "bg-primary": webSearch,
+                }
+              )}
             >
               <Globe className="size-full" />
             </button>

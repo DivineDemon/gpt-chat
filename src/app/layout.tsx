@@ -14,7 +14,7 @@ const firaCode = Fira_Code({
 export const metadata: Metadata = {
   title: "GPT Chat",
   description: "Because no one should pay for help.",
-  icons: [{ rel: "icon", url: "/favicon.ico" }],
+  icons: [{ rel: "icon", url: "/favicon.svg" }],
 };
 
 export default function RootLayout({

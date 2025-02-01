@@ -4,6 +4,7 @@ import { TRPCReactProvider } from "@/trpc/react";
 
 import { ThemeProvider } from "./theme-provider";
 import { SidebarProvider } from "./ui/sidebar";
+import { Toaster } from "./ui/sonner";
 import { TooltipProvider } from "./ui/tooltip";
 
 const Providers = ({ children }: { children: ReactNode }) => {
@@ -16,7 +17,10 @@ const Providers = ({ children }: { children: ReactNode }) => {
         disableTransitionOnChange
       >
         <SidebarProvider>
-          <TooltipProvider>{children}</TooltipProvider>
+          <TooltipProvider>
+            <Toaster richColors={true} duration={1500} />
+            {children}
+          </TooltipProvider>
         </SidebarProvider>
       </ThemeProvider>
     </TRPCReactProvider>

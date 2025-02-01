@@ -1,4 +1,5 @@
 import { type ClassValue, clsx } from "clsx";
+import { toast } from "sonner";
 import { twMerge } from "tailwind-merge";
 
 export function cn(...inputs: ClassValue[]) {
@@ -23,4 +24,13 @@ export function imageToB64(file: File): Promise<string> {
 
     reader.readAsDataURL(file);
   });
+}
+
+export async function copyToClipboard(text: string): Promise<void> {
+  try {
+    await navigator.clipboard.writeText(text);
+    toast.success("Copied to clipboard!");
+  } catch (err) {
+    toast.error("Failed to copy to clipboard.");
+  }
 }

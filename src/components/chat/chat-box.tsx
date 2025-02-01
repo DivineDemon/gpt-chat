@@ -4,10 +4,10 @@ import { Fragment, useEffect, useRef, useState } from "react";
 
 import MDEditor from "@uiw/react-md-editor";
 import { readStreamableValue } from "ai/rsc";
-import { ArrowUp, Globe, Paperclip } from "lucide-react";
+import { ArrowUp, Copy, Globe, Paperclip } from "lucide-react";
 
 import { askQuestion } from "@/app/chat/(server-actions)/ask-question";
-import { cn } from "@/lib/utils";
+import { cn, copyToClipboard } from "@/lib/utils";
 
 import { Input } from "../ui/input";
 
@@ -66,9 +66,18 @@ const ChatBox = () => {
       <div className="flex h-full max-h-[calc(100vh-202px)] w-full flex-col items-center justify-start gap-8 overflow-y-auto rounded-xl border p-4">
         {messages.map((message) => (
           <Fragment key={message.id}>
-            <span className="ml-auto w-fit max-w-md text-wrap rounded-xl bg-primary/20 px-4 py-1 text-right text-primary">
-              {message.client}
-            </span>
+            <div className="flex w-full flex-col items-end justify-end gap-1.5">
+              <span className="ml-auto w-fit max-w-md text-wrap rounded-xl bg-primary/20 px-4 py-1 text-right text-primary">
+                {message.client}
+              </span>
+              <button
+                type="button"
+                onClick={() => copyToClipboard(message.client)}
+                className="flex size-6 items-center justify-center rounded p-1 transition-colors hover:bg-muted"
+              >
+                <Copy className="size-full text-gray-500" />
+              </button>
+            </div>
             {message.bot === "" ? (
               <div className="mr-auto flex items-center justify-start rounded-xl bg-primary/20 p-3">
                 <div className="mx-1 size-2 animate-fade-dots rounded-full bg-primary" />
@@ -82,16 +91,25 @@ const ChatBox = () => {
                 />
               </div>
             ) : (
-              <span className="mr-auto w-full text-wrap rounded-xl bg-transparent text-left text-primary">
-                <MDEditor.Markdown
-                  source={message.bot}
-                  style={{
-                    backgroundColor: "transparent",
-                    color: "hsl(var(--primary))",
-                  }}
-                  className="bg-transparent text-primary"
-                />
-              </span>
+              <div className="flex w-full flex-col items-start justify-start gap-1.5">
+                <span className="mr-auto w-full text-wrap rounded-xl bg-transparent text-left text-primary">
+                  <MDEditor.Markdown
+                    source={message.bot}
+                    style={{
+                      backgroundColor: "transparent",
+                      color: "hsl(var(--primary))",
+                    }}
+                    className="bg-transparent text-primary"
+                  />
+                </span>
+                <button
+                  type="button"
+                  onClick={() => copyToClipboard(message.bot)}
+                  className="flex size-6 items-center justify-center rounded p-1 transition-colors hover:bg-muted"
+                >
+                  <Copy className="size-full text-gray-500" />
+                </button>
+              </div>
             )}
           </Fragment>
         ))}

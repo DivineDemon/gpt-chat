@@ -259,3 +259,4 @@ const ChatBox = () => {
 };
 
 export default ChatBox;
+export const maxDuration = 30;

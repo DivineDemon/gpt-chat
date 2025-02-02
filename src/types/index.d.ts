@@ -6,3 +6,8 @@ declare type Message = {
   type: "CLIENT" | "BOT";
   conversationId: string | null;
 };
+
+declare type AIMessage = {
+  role: "user" | "assistant" | "system" | "data";
+  content: any;
+};

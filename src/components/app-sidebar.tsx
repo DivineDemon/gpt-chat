@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 
 import { Edit, Loader2, Trash } from "lucide-react";
 import { toast } from "sonner";
@@ -16,7 +16,7 @@ import {
 } from "@/components/ui/sidebar";
 import useChat from "@/hooks/use-chat";
 import useRefetch from "@/hooks/use-refetch";
-import { cn } from "@/lib/utils";
+import { cleanAndTruncate, cn } from "@/lib/utils";
 import { api } from "@/trpc/react";
 
 import { Button } from "./ui/button";
@@ -26,8 +26,18 @@ const AppSidebar = () => {
   const refetch = useRefetch();
   const { chatId, chats, setChatId } = useChat();
   const [selected, setSelected] = useState<string>("");
+  const [searchQuery, setSearchQuery] = useState<string>("");
   const deleteConversation = api.conversation.deleteConversation.useMutation();
   const createConversation = api.conversation.createConversation.useMutation();
+
+  const filteredChats = useMemo(() => {
+    if (!chats) return [];
+    return searchQuery
+      ? chats.filter((item) =>
+          item.name?.toLowerCase().includes(searchQuery.toLowerCase())
+        )
+      : chats;
+  }, [chats, searchQuery]);
 
   const handleConversationCreation = async () => {
     const response = await createConversation.mutateAsync(undefined, {
@@ -69,7 +79,13 @@ const AppSidebar = () => {
     <Sidebar>
       <SidebarHeader className="h-16 border-b">
         <div className="flex h-full w-full items-center justify-center gap-2.5">
-          <Input type="text" placeholder="Search Chats..." className="flex-1" />
+          <Input
+            type="text"
+            placeholder="Search Chats..."
+            className="flex-1"
+            onChange={(e) => setSearchQuery(e.target.value)}
+            value={searchQuery}
+          />
           <Button
             disabled={createConversation.isPending}
             onClick={handleConversationCreation}
@@ -88,43 +104,52 @@ const AppSidebar = () => {
       <SidebarContent>
         <SidebarGroup>
           <SidebarMenu>
-            {chats?.map((item, idx) => (
-              <SidebarMenuItem key={item.id}>
-                <SidebarMenuButton asChild>
-                  <div
-                    className={cn("flex w-full items-center justify-start", {
-                      "bg-primary/20 text-primary": item.id === chatId,
-                    })}
-                  >
+            {filteredChats.length > 0 ? (
+              filteredChats.map((item) => (
+                <SidebarMenuItem key={item.id}>
+                  <SidebarMenuButton asChild>
                     <div
-                      onClick={() => changeActiveConversation(item.id)}
-                      className="flex flex-1 cursor-pointer items-center justify-center"
+                      className={cn("flex w-full items-center justify-start", {
+                        "bg-primary/20 text-primary": item.id === chatId,
+                      })}
                     >
-                      <div className="flex size-5 items-center justify-center rounded-sm bg-primary uppercase text-white">
-                        {item.id.charAt(0)}
+                      <div
+                        onClick={() => changeActiveConversation(item.id)}
+                        className="flex flex-1 cursor-pointer items-center justify-center"
+                      >
+                        <div className="flex size-5 items-center justify-center rounded-sm bg-primary uppercase text-white">
+                          {cleanAndTruncate(`${item.name}`, 14).charAt(0)}
+                        </div>
+                        <span className="ml-2 flex-1 text-left">
+                          {cleanAndTruncate(`${item.name}`, 14)}
+                        </span>
                       </div>
-                      <span className="ml-2 flex-1 text-left">
-                        Conversation&nbsp;{idx + 1}
-                      </span>
+                      <button
+                        disabled={deleteConversation.isPending}
+                        onClick={() => {
+                          setSelected(item.id);
+                          handleDelete(item.id);
+                        }}
+                        type="button"
+                      >
+                        {deleteConversation.isPending &&
+                        selected === item.id ? (
+                          <Loader2 className="size-5 animate-spin" />
+                        ) : (
+                          <Trash className="size-5" />
+                        )}
+                      </button>
                     </div>
-                    <button
-                      disabled={deleteConversation.isPending}
-                      onClick={() => {
-                        setSelected(item.id);
-                        handleDelete(item.id);
-                      }}
-                      type="button"
-                    >
-                      {deleteConversation.isPending && selected === item.id ? (
-                        <Loader2 className="size-5 animate-spin" />
-                      ) : (
-                        <Trash className="size-5" />
-                      )}
-                    </button>
-                  </div>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-            ))}
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              ))
+            ) : (
+              <div className="p-4 text-center text-sm text-muted-foreground">
+                {searchQuery
+                  ? "No chats found matching your search."
+                  : "No chats available."}
+              </div>
+            )}
           </SidebarMenu>
         </SidebarGroup>
       </SidebarContent>

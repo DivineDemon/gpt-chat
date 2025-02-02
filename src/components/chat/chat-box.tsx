@@ -8,12 +8,14 @@ import { ArrowUp, Copy, Globe, Paperclip } from "lucide-react";
 
 import { askQuestion } from "@/app/chat/(server-actions)/ask-question";
 import useChat from "@/hooks/use-chat";
+import useRefetch from "@/hooks/use-refetch";
 import { cn, copyToClipboard } from "@/lib/utils";
 import { api } from "@/trpc/react";
 
 import { Input } from "../ui/input";
 
 const ChatBox = () => {
+  const refetch = useRefetch();
   const fileRef = useRef<HTMLInputElement>(null);
   const [files, setFiles] = useState<File[]>([]);
   const [message, setMessage] = useState<string>("");
@@ -67,7 +69,7 @@ const ChatBox = () => {
       });
 
       let botResponse = "";
-      const { output } = await askQuestion(message, webSearch, files);
+      const { output } = await askQuestion(message, webSearch, chatId, files);
 
       for await (const delta of readStreamableValue(output)) {
         if (delta) {
@@ -95,6 +97,9 @@ const ChatBox = () => {
     } finally {
       setLoading(false);
     }
+
+    setFiles([]);
+    refetch();
   };
 
   const createNewConversation = async () => {

@@ -34,3 +34,13 @@ export async function copyToClipboard(text: string): Promise<void> {
     toast.error("Failed to copy to clipboard.");
   }
 }
+
+export function cleanAndTruncate(input: string, maxLength: number): string {
+  const cleaned = input.replace(/[^a-zA-Z0-9 ]/g, "");
+
+  if (cleaned.length > maxLength) {
+    return cleaned.slice(0, maxLength) + "...";
+  }
+
+  return cleaned;
+}

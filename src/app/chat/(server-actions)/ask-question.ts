@@ -6,10 +6,12 @@ import { createStreamableValue } from "ai/rsc";
 
 import { env } from "@/env";
 import { performWebSearch } from "@/lib/web-search";
+import { db } from "@/server/db";
 
 import { parseSpreadsheet } from "./excel-parser";
 import { parseImage } from "./image-parser";
 import { parsePdf } from "./pdf-parser";
+import { generateConversationTitle } from "./update-conversation-title";
 import { parseDocument } from "./word-parser";
 
 const openAI = createOpenAI({
@@ -24,13 +26,40 @@ type ImageArray = {
 export async function askQuestion(
   query: string,
   webSearch: boolean,
+  conversationId: string,
   file?: File | File[]
 ) {
   let webSearchContent = "";
   let combinedFileContent = "";
   const imageFiles: ImageArray[] = [];
   const stream = createStreamableValue();
+  let formattedPreviousMessages: AIMessage[] = [];
   const fileArray = Array.isArray(file) ? file : file ? [file] : [];
+
+  const previousMessages = await db.message.findMany({
+    where: {
+      conversationId,
+    },
+  });
+
+  const findConversation = await db.conversation.findUnique({
+    where: {
+      id: conversationId,
+    },
+  });
+
+  if (findConversation) {
+    if (findConversation.name === "New chat") {
+      await generateConversationTitle(query, conversationId);
+    }
+  }
+
+  if (previousMessages) {
+    formattedPreviousMessages = previousMessages.slice(-10).map((message) => ({
+      role: message.type === "CLIENT" ? "user" : "assistant",
+      content: [{ type: "text", text: message.content }],
+    }));
+  }
 
   for (const file of fileArray) {
     if (file.name.endsWith(".pdf")) {
@@ -67,6 +96,7 @@ export async function askQuestion(
     const { textStream } = await streamText({
       model: openAI("chatgpt-4o-latest"),
       messages: [
+        ...formattedPreviousMessages,
         {
           role: "user",
           content: [

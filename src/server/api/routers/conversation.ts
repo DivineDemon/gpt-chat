@@ -6,6 +6,7 @@ export const conversationRouter = createTRPCRouter({
   createConversation: privateProcedure.mutation(async ({ ctx }) => {
     const conversation = await ctx.db.conversation.create({
       data: {
+        name: "New chat",
         userId: ctx.user.userId!,
       },
     });
@@ -28,6 +29,18 @@ export const conversationRouter = createTRPCRouter({
       return ctx.db.conversation.delete({
         where: {
           id: input.conversationId,
+        },
+      });
+    }),
+  getConversation: privateProcedure
+    .input(z.object({ id: z.string() }))
+    .query(async ({ ctx, input }) => {
+      return await ctx.db.conversation.findFirst({
+        where: {
+          id: input.id,
+        },
+        include: {
+          messages: true,
         },
       });
     }),

@@ -3,9 +3,10 @@
 - [x] Chat Persistence in DB
 - [x] Chat Listing with Timeline
 - [x] File Parsing
-- [ ] Previous Chat as Input for LLM
+- [x] Previous Chat as Input for LLM
 - [x] Web Search
 - [x] Code Formatting in AI Response
 - [x] User Persistence in DB
 - [x] Message Copy
 - [x] Chat CRUD
+- [x] Generating Chat Title

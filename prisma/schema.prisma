@@ -13,39 +13,40 @@ enum MessageType {
 }
 
 model User {
-  id        String  @id @default(uuid())
-  imageUrl  String?
-  email     String  @unique
-  firstName String?
-  lastName  String?
+  id            String         @id @default(uuid())
+  imageUrl      String?
+  email         String         @unique
+  firstName     String?
+  lastName      String?
+  conversations Conversation[]
 
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
-  Message   Message[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@index([email], map: "email_index")
 }
 
-model Message {
-  id      String      @id @default(uuid())
-  type    MessageType
-  content String
-  userId  String
-
-  user User @relation(fields: [userId], references: [id])
-
-  createdAt      DateTime      @default(now())
-  updatedAt      DateTime      @updatedAt
-  Conversation   Conversation? @relation(fields: [conversationId], references: [id])
-  conversationId String?
-
-  @@index([conversationId], map: "conversation_index")
-}
-
 model Conversation {
   id       String    @id @default(uuid())
+  userId   String
+  user     User      @relation(fields: [userId], references: [id])
   messages Message[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  @@index([userId], map: "user_conversation_index")
+}
+
+model Message {
+  id             String       @id @default(uuid())
+  type           MessageType
+  content        String
+  conversationId String
+  conversation   Conversation @relation(fields: [conversationId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([conversationId], map: "conversation_message_index")
 }

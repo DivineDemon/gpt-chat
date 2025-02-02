@@ -8,4 +8,4 @@
 - [x] Code Formatting in AI Response
 - [x] User Persistence in DB
 - [x] Message Copy
-- [ ] Chat CRUD
+- [x] Chat CRUD

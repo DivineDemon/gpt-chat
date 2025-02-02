@@ -1,5 +1,8 @@
 declare type Message = {
-  id: number;
-  bot: string;
-  client: string;
+  id: string;
+  content: string;
+  createdAt: Date;
+  updatedAt: Date;
+  type: "CLIENT" | "BOT";
+  conversationId: string | null;
 };

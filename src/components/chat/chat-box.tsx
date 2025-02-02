@@ -7,7 +7,9 @@ import { readStreamableValue } from "ai/rsc";
 import { ArrowUp, Copy, Globe, Paperclip } from "lucide-react";
 
 import { askQuestion } from "@/app/chat/(server-actions)/ask-question";
+import useChat from "@/hooks/use-chat";
 import { cn, copyToClipboard } from "@/lib/utils";
+import { api } from "@/trpc/react";
 
 import { Input } from "../ui/input";
 
@@ -16,9 +18,12 @@ const ChatBox = () => {
   const [files, setFiles] = useState<File[]>([]);
   const [message, setMessage] = useState<string>("");
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const { chatId, conversation, setChatId } = useChat();
   const [loading, setLoading] = useState<boolean>(false);
   const [messages, setMessages] = useState<Message[]>([]);
   const [webSearch, setWebSearch] = useState<boolean>(false);
+  const createMessage = api.message.createMessage.useMutation();
+  const createConversation = api.conversation.createConversation.useMutation();
 
   const handleFileUpload = () => {
     if (fileRef.current) {
@@ -27,29 +32,64 @@ const ChatBox = () => {
   };
 
   const handleMessage = async () => {
+    if (!message.trim()) {
+      return;
+    }
+
     setMessage("");
     setLoading(true);
 
-    setMessages((prev) => [
-      ...prev,
-      { id: prev.length + 1, client: message, bot: "" },
+    setMessages([
+      ...messages,
+      {
+        id: `${messages.length + 1}`,
+        type: "CLIENT",
+        content: message,
+        conversationId: chatId,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      },
+      {
+        id: `${messages.length + 2}`,
+        type: "BOT",
+        content: "",
+        conversationId: chatId,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      },
     ]);
 
     try {
+      await createMessage.mutateAsync({
+        content: message,
+        conversationId: chatId,
+        type: "CLIENT",
+      });
+
+      let botResponse = "";
       const { output } = await askQuestion(message, webSearch, files);
+
       for await (const delta of readStreamableValue(output)) {
         if (delta) {
+          botResponse += delta;
+
           setMessages((prev) => {
             const updatedMessages = [...prev];
             const lastMessage = updatedMessages[updatedMessages.length - 1];
             updatedMessages[updatedMessages.length - 1] = {
               ...lastMessage,
-              bot: (lastMessage?.bot || "") + delta,
+              content: (lastMessage?.content || "") + delta,
             } as Message;
             return updatedMessages;
           });
         }
       }
+
+      await createMessage.mutateAsync({
+        content: botResponse,
+        conversationId: chatId,
+        type: "BOT",
+      });
     } catch (error) {
       console.error("Error streaming response:", error);
     } finally {
@@ -57,60 +97,78 @@ const ChatBox = () => {
     }
   };
 
+  const createNewConversation = async () => {
+    const response = await createConversation.mutateAsync();
+
+    if (response) {
+      setChatId(response.id);
+    }
+  };
+
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
+
+  useEffect(() => {
+    if (!chatId) {
+      createNewConversation();
+    } else {
+      setMessages(conversation?.messages || []);
+    }
+  }, [chatId, conversation]);
 
   return (
     <div className="flex h-full w-full flex-col items-center justify-between gap-5">
       <div className="flex h-full max-h-[calc(100vh-202px)] w-full flex-col items-center justify-start gap-8 overflow-y-auto rounded-xl border p-4">
         {messages.map((message) => (
           <Fragment key={message.id}>
-            <div className="flex w-full flex-col items-end justify-end gap-1.5">
-              <span className="ml-auto w-fit max-w-md text-wrap rounded-xl bg-primary/20 px-4 py-1 text-right text-primary">
-                {message.client}
-              </span>
-              <button
-                type="button"
-                onClick={() => copyToClipboard(message.client)}
-                className="flex size-6 items-center justify-center rounded p-1 transition-colors hover:bg-muted"
+            <div
+              className={cn("flex w-full flex-col gap-1.5", {
+                "items-end justify-end": message.type === "CLIENT",
+                "items-start justify-start": message.type === "BOT",
+              })}
+            >
+              <span
+                className={cn("text-wrap rounded-xl text-primary", {
+                  "ml-auto w-fit max-w-md bg-primary/20 px-4 py-1 text-right":
+                    message.type === "CLIENT",
+                  "mr-auto w-full bg-transparent text-left":
+                    message.type === "BOT",
+                })}
               >
-                <Copy className="size-full text-gray-500" />
-              </button>
-            </div>
-            {message.bot === "" ? (
-              <div className="mr-auto flex items-center justify-start rounded-xl bg-primary/20 p-3">
-                <div className="mx-1 size-2 animate-fade-dots rounded-full bg-primary" />
-                <div
-                  className="mx-1 size-2 animate-fade-dots rounded-full bg-primary"
-                  style={{ animationDelay: "0.1s" }}
-                />
-                <div
-                  className="mx-1 size-2 animate-fade-dots rounded-full bg-primary"
-                  style={{ animationDelay: "0.3s" }}
-                />
-              </div>
-            ) : (
-              <div className="flex w-full flex-col items-start justify-start gap-1.5">
-                <span className="mr-auto w-full text-wrap rounded-xl bg-transparent text-left text-primary">
+                {message.type === "CLIENT" ? (
+                  message.content
+                ) : message.content === "" ? (
+                  <div className="mr-auto flex w-fit items-center justify-start rounded-xl bg-primary/20 p-3">
+                    <div className="mx-1 size-2 animate-fade-dots rounded-full bg-primary" />
+                    <div
+                      className="mx-1 size-2 animate-fade-dots rounded-full bg-primary"
+                      style={{ animationDelay: "0.1s" }}
+                    />
+                    <div
+                      className="mx-1 size-2 animate-fade-dots rounded-full bg-primary"
+                      style={{ animationDelay: "0.3s" }}
+                    />
+                  </div>
+                ) : (
                   <MDEditor.Markdown
-                    source={message.bot}
+                    source={message.content}
                     style={{
                       backgroundColor: "transparent",
                       color: "hsl(var(--primary))",
                     }}
                     className="bg-transparent text-primary"
                   />
-                </span>
-                <button
-                  type="button"
-                  onClick={() => copyToClipboard(message.bot)}
-                  className="flex size-6 items-center justify-center rounded p-1 transition-colors hover:bg-muted"
-                >
-                  <Copy className="size-full text-gray-500" />
-                </button>
-              </div>
-            )}
+                )}
+              </span>
+              <button
+                type="button"
+                onClick={() => copyToClipboard(message.content)}
+                className="flex size-6 items-center justify-center rounded p-1 transition-colors hover:bg-muted"
+              >
+                <Copy className="size-full text-gray-500" />
+              </button>
+            </div>
           </Fragment>
         ))}
         <div ref={messagesEndRef} />
@@ -127,7 +185,7 @@ const ChatBox = () => {
             type="text"
             value={message}
             disabled={loading}
-            placeholder={`What can I help with ? ${webSearch}`}
+            placeholder="What can I help with ?"
             className="flex-1 border-none shadow-none"
             onChange={(e) => setMessage(e.target.value)}
           />

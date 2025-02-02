@@ -5,10 +5,8 @@ import Link from "next/link";
 
 import * as Clerk from "@clerk/elements/common";
 import * as SignUp from "@clerk/elements/sign-up";
-import { BrainCog, Waypoints } from "lucide-react";
 
-import GithubIcon from "@/assets/img/github.svg";
-import GoogleIcon from "@/assets/img/google.svg";
+import Logo from "@/assets/img/favicon.svg";
 import { ModeToggle } from "@/components/mode-toggle";
 import { buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -25,7 +23,13 @@ const Page = () => {
           className="w-full space-y-6 px-4 py-10 sm:w-96 sm:px-8"
         >
           <header className="flex flex-col items-center text-center">
-            <BrainCog className="size-10 text-primary" />
+            <Image
+              src={Logo}
+              alt="logo"
+              width={40}
+              height={40}
+              className="size-10"
+            />
             <h1 className="mt-4 text-xl font-medium tracking-tight">
               Create an account
             </h1>
@@ -38,7 +42,7 @@ const Page = () => {
                 type="email"
                 required
                 placeholder="Email"
-                className="w-full border-b border-neutral-200 bg-transparent pb-2 text-sm/6 text-neutral-950 outline-none placeholder:text-neutral-400 hover:border-neutral-300 focus:border-neutral-600 data-[invalid]:border-red-600 data-[invalid]:text-red-600"
+                className="w-full border-b border-neutral-200 bg-transparent pb-2 text-sm/6 text-neutral-950 outline-none placeholder:text-neutral-400 hover:border-neutral-300 focus:border-neutral-600 data-[invalid]:border-red-600 data-[invalid]:text-red-600 dark:text-neutral-50"
               />
               <Clerk.FieldError className="block text-sm text-red-400" />
             </Clerk.Field>
@@ -48,7 +52,7 @@ const Page = () => {
                 type="password"
                 required
                 placeholder="Password"
-                className="w-full border-b border-neutral-200 bg-transparent pb-2 text-sm/6 text-neutral-950 outline-none placeholder:text-neutral-400 hover:border-neutral-300 focus:border-neutral-600 data-[invalid]:border-red-600 data-[invalid]:text-red-600"
+                className="w-full border-b border-neutral-200 bg-transparent pb-2 text-sm/6 text-neutral-950 outline-none placeholder:text-neutral-400 hover:border-neutral-300 focus:border-neutral-600 data-[invalid]:border-red-600 data-[invalid]:text-red-600 dark:text-neutral-50"
               />
               <Clerk.FieldError className="block text-sm text-red-400" />
             </Clerk.Field>
@@ -74,14 +78,14 @@ const Page = () => {
                 name="google"
                 className="flex w-full items-center justify-center gap-x-3 rounded-md bg-gradient-to-b from-white to-neutral-50 px-2 py-1.5 text-sm font-medium text-neutral-950 shadow outline-none ring-1 ring-black/5 hover:to-neutral-100 focus-visible:outline-offset-2 focus-visible:outline-neutral-600 active:text-neutral-950/60"
               >
-                <Image src={GoogleIcon} alt="google-icon" className="size-5" />
+                <Clerk.Icon />
                 Register with Google
               </Clerk.Connection>
               <Clerk.Connection
                 name="github"
                 className="flex w-full items-center justify-center gap-x-3 rounded-md bg-gradient-to-b from-white to-neutral-50 px-2 py-1.5 text-sm font-medium text-neutral-950 shadow outline-none ring-1 ring-black/5 hover:to-neutral-100 focus-visible:outline-offset-2 focus-visible:outline-neutral-600 active:text-neutral-950/60"
               >
-                <Image src={GithubIcon} alt="github-icon" className="size-5" />
+                <Clerk.Icon />
                 Register with Github
               </Clerk.Connection>
             </div>
@@ -101,7 +105,13 @@ const Page = () => {
           className="w-full space-y-6 px-4 py-10 sm:w-96 sm:px-8"
         >
           <header className="flex flex-col items-center text-center">
-            <Waypoints className="size-10 text-primary" />
+            <Image
+              src={Logo}
+              alt="logo"
+              width={40}
+              height={40}
+              className="size-10"
+            />
             <h1 className="mt-4 text-xl font-medium tracking-tight text-neutral-950">
               Verify email code
             </h1>

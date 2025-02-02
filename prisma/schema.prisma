@@ -23,7 +23,7 @@ model User {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  @@index([email], map: "email_index")
+  @@index([email, firstName, lastName], map: "email_index")
 }
 
 model Conversation {
@@ -36,7 +36,7 @@ model Conversation {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  @@index([userId], map: "user_conversation_index")
+  @@index([name], map: "user_conversation_index")
 }
 
 model Message {
@@ -49,5 +49,5 @@ model Message {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  @@index([conversationId], map: "conversation_message_index")
+  @@index([type], map: "conversation_message_index")
 }

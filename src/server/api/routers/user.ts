@@ -1,5 +1,9 @@
 import { userSchema } from "@/lib/validators";
-import { createTRPCRouter, publicProcedure } from "@/server/api/trpc";
+import {
+  createTRPCRouter,
+  privateProcedure,
+  publicProcedure,
+} from "@/server/api/trpc";
 
 export const userRouter = createTRPCRouter({
   syncUser: publicProcedure
@@ -23,4 +27,11 @@ export const userRouter = createTRPCRouter({
         },
       });
     }),
+  findUser: privateProcedure.query(async ({ ctx }) => {
+    return await ctx.db.user.findUnique({
+      where: {
+        id: ctx.user.userId!,
+      },
+    });
+  }),
 });

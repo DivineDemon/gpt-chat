@@ -1,9 +1,10 @@
+import Image from "next/image";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 
 import { auth } from "@clerk/nextjs/server";
-import { BrainCog } from "lucide-react";
 
+import Logo from "@/assets/img/favicon.svg";
 import { ModeToggle } from "@/components/mode-toggle";
 import { buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -20,7 +21,7 @@ const Page = async () => {
       <div className="absolute right-5 top-5">
         <ModeToggle />
       </div>
-      <BrainCog className="size-16 text-primary" />
+      <Image src={Logo} alt="logo" width={64} height={64} className="size-16" />
       <div className="flex w-full flex-col items-center justify-center gap-1.5">
         <span className="w-full text-center text-5xl font-bold">GPT Chat</span>
         <span className="w-full text-center dark:text-white/50">

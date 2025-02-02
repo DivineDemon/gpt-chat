@@ -19,6 +19,12 @@ const Page = async () => {
     return notFound();
   }
 
+  const checkUser = await api.user.findUser();
+
+  if (checkUser) {
+    redirect("/chat");
+  }
+
   const response = await api.user.syncUser({
     id: userId,
     lastName: user.lastName ?? "",

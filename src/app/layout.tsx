@@ -1,9 +1,8 @@
 import { type Metadata } from "next";
 import { Fira_Code } from "next/font/google";
 
-import { ClerkProvider } from "@clerk/nextjs";
-
 import "@/assets/css/globals.css";
+import { AuthProvider } from "@/components/auth-provider";
 import Providers from "@/components/providers";
 import { cn } from "@/lib/utils";
 
@@ -21,7 +20,7 @@ export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <ClerkProvider>
+    <AuthProvider>
       <html lang="en" suppressHydrationWarning={true}>
         <body
           className={cn(
@@ -34,6 +33,6 @@ export default function RootLayout({
           </main>
         </body>
       </html>
-    </ClerkProvider>
+    </AuthProvider>
   );
 }

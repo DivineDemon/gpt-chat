@@ -30,7 +30,7 @@ export const userRouter = createTRPCRouter({
   findUser: privateProcedure.query(async ({ ctx }) => {
     return await ctx.db.user.findUnique({
       where: {
-        id: ctx.user.userId!,
+        id: ctx.user.id,
       },
     });
   }),

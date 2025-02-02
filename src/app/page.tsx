@@ -1,21 +1,12 @@
 import Image from "next/image";
 import Link from "next/link";
-import { redirect } from "next/navigation";
-
-import { auth } from "@clerk/nextjs/server";
 
 import Logo from "@/assets/img/favicon.svg";
 import { ModeToggle } from "@/components/mode-toggle";
 import { buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
-const Page = async () => {
-  const { userId } = await auth();
-
-  if (userId) {
-    redirect("/chat");
-  }
-
+const Page = () => {
   return (
     <div className="relative flex h-screen w-full flex-col items-center justify-center gap-5">
       <div className="absolute right-5 top-5">

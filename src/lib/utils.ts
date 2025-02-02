@@ -44,3 +44,7 @@ export function cleanAndTruncate(input: string, maxLength: number): string {
 
   return cleaned;
 }
+
+export function clearLocalStorage() {
+  localStorage.clear();
+}

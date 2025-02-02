@@ -108,6 +108,8 @@ const ChatBox = () => {
     if (response) {
       setChatId(response.id);
     }
+
+    refetch();
   };
 
   useEffect(() => {

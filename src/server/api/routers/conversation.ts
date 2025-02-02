@@ -7,7 +7,7 @@ export const conversationRouter = createTRPCRouter({
     const conversation = await ctx.db.conversation.create({
       data: {
         name: "New chat",
-        userId: ctx.user.userId!,
+        userId: ctx.user.id,
       },
     });
 
@@ -16,7 +16,7 @@ export const conversationRouter = createTRPCRouter({
   getConversations: privateProcedure.query(async ({ ctx }) => {
     return await ctx.db.conversation.findMany({
       where: {
-        userId: ctx.user.userId!,
+        userId: ctx.user.id,
       },
       include: {
         messages: true,

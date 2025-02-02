@@ -4,23 +4,15 @@ import { createOpenAI } from "@ai-sdk/openai";
 import { streamText } from "ai";
 import { createStreamableValue } from "ai/rsc";
 
-
-
 import { env } from "@/env";
 import { performWebSearch } from "@/lib/web-search";
 import { db } from "@/server/db";
-
-
 
 import { parseSpreadsheet } from "./excel-parser";
 import { parseImage } from "./image-parser";
 import { parsePdf } from "./pdf-parser";
 import { generateConversationTitle } from "./update-conversation-title";
 import { parseDocument } from "./word-parser";
-
-
-
-
 
 const openAI = createOpenAI({
   apiKey: env.OPENAI_KEY,

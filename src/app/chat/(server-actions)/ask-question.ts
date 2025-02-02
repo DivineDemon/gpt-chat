@@ -138,5 +138,3 @@ export async function askQuestion(
     output: stream.value,
   };
 }
-
-export const maxDuration = 30;

@@ -164,7 +164,7 @@ const ChatBox = () => {
                       backgroundColor: "transparent",
                       color: "hsl(var(--primary))",
                     }}
-                    className="bg-transparent text-primary"
+                    className="bg-transparent text-primary max-w-md prose"
                   />
                 )}
               </span>
